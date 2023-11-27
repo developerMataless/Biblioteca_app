@@ -2,7 +2,7 @@ from datetime import date, datetime
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from usuarios.models import Usuario
-from .models import Emprestimos, Livros, Categoria
+from .models import Emprestimo, Livros, Categoria
 from .forms import CadastroLivro, CategoriaLivro
 from django import forms
 from django.db.models import Q
@@ -44,7 +44,7 @@ def ver_livros(request, id):
         if request.session.get('usuario') == livro.usuario.id:
             usuario = Usuario.objects.get(id = request.session['usuario'])
             categoria_livro = Categoria.objects.filter(usuario = request.session.get('usuario'))
-            emprestimos = Emprestimos.objects.filter(livro = livro)
+            emprestimos = Emprestimo.objects.filter(livro = livro)
             form = CadastroLivro()
             form.fields['usuario'].initial = request.session['usuario']
             form.fields['categoria'].queryset = Categoria.objects.filter(usuario = usuario)
@@ -104,10 +104,10 @@ def cadastrar_emprestimo(request):
         livro_emprestado = request.POST.get('livro_emprestado')
         
         if nome_emprestado_anonimo:
-            emprestimo = Emprestimos(nome_emprestado_anonimo = nome_emprestado_anonimo,
+            emprestimo = Emprestimo(nome_emprestado_anonimo = nome_emprestado_anonimo,
                                     livro_id = livro_emprestado)
         else:
-            emprestimo = Emprestimos(nome_emprestado_id=nome_emprestado,
+            emprestimo = Emprestimo(nome_emprestado_id=nome_emprestado,
                                     livro_id = livro_emprestado)
         emprestimo.save()
 
@@ -124,7 +124,7 @@ def devolver_livro(request):
     livro_devolver.emprestado = False
     livro_devolver.save()
     
-    emprestimo_devolver = Emprestimos.objects.get(Q(livro = livro_devolver) & Q(data_devolucao = None) )
+    emprestimo_devolver = Emprestimo.objects.get(Q(livro = livro_devolver) & Q(data_devolucao = None) )
     emprestimo_devolver.data_devolucao = datetime.now() 
     emprestimo_devolver.save()
 
@@ -151,7 +151,7 @@ def alterar_livro(request):
 
 def seus_emprestimos(request):
     usuario = Usuario.objects.get(id = request.session['usuario'])
-    emprestimos = Emprestimos.objects.filter(nome_emprestado = usuario)
+    emprestimos = Emprestimo.objects.filter(nome_emprestado = usuario)
     
 
 
@@ -165,7 +165,7 @@ def processa_avaliacao(request):
     #TODO: Verificar segurança
     #TODO: Não permitir avaliação de livro nao devolvido
     #TODO: Colocar as estrelas
-    emprestimo = Emprestimos.objects.get(id = id_emprestimo)
+    emprestimo = Emprestimo.objects.get(id = id_emprestimo)
     emprestimo.avaliacao = opcoes
     emprestimo.save()
     return redirect(f'/livro/ver_livro/{id_livro}')
