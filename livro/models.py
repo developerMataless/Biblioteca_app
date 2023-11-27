@@ -12,7 +12,6 @@ class Categoria(models.Model):
     def __str__(self) -> str:
         return self.nome
 
-
 class Livros(models.Model):
     nome = models.CharField(max_length = 100)
     autor = models.CharField(max_length = 30)
