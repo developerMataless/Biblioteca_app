@@ -27,7 +27,7 @@ class Livros(models.Model):
     def __str__(self):
         return self.nome
 
-class Emprestimos(models.Model):
+class Emprestimo(models.Model):
     choices = (
         ('P', 'Péssimo'),
         ('R', 'Ruim'),
